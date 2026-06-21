@@ -10,11 +10,22 @@ class ExchangeService:
     def __init__(self):
         self.client = PrivatBankClient()
 
-    async def get_exchange(
-        self,
-        days: int,
-        currencies: list[str] | None = None
-    ):
+
+    async def get_available_currencies(self) -> set[str]:
+        response = await self.client.get_rates_for_date(datetime.now().strftime("%d.%m.%Y"))
+
+        currencies = set()
+
+        for item in response["exchangeRate"]:
+
+            currency = item.get("currency")
+
+            if currency:
+                currencies.add(currency.upper())
+
+        return currencies
+    
+    async def get_exchange(self,days: int,currencies: list[str] | None = None):
         # защита от неправильного диапазона дней
         if days < 1 or days > 10:
             raise ValueError("Days must be between 1 and 10")
@@ -62,7 +73,7 @@ class ExchangeService:
             currencies = self.DEFAULT_CURRENCIES
 
         result = []
-        
+
         # проходим по каждому ответу от API и фильтруем валюты
         for response in responses:
 
