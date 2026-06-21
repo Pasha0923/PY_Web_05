@@ -96,8 +96,16 @@ class ExchangeService:
                     continue
 
                 day_data[currency] = {
-                    "sale": item.get("saleRate"),
-                    "purchase": item.get("purchaseRate")
+                    "sale": (
+                        item.get("saleRate")
+                        if item.get("saleRate") is not None
+                        else item.get("saleRateNB")
+                    ),
+                    "purchase": (
+                        item.get("purchaseRate")
+                        if item.get("purchaseRate") is not None
+                        else item.get("purchaseRateNB")
+                    )
                 }
 
             result.append({date: day_data})
